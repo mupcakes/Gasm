@@ -1,7 +1,3 @@
-#Title : baispam 
-#Author : MUpton@LiquidWeb.com
-#Version : 0.1
-
 .data
 motd:
 	.asciz "Its time to kill spam and chew bubblegum, and im all out of gum.\n"
