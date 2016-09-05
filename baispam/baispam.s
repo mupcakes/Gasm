@@ -1,0 +1,113 @@
+#Title : baispam
+#Author : MUpton@LiquidWeb.com
+#Version : 0.1
+
+.data
+motd:
+	.asciz "Its time to kill spam and chew bubblegum, and im all out of gum.\n"
+
+eximBin:
+	.asciz "/usr/sbin/exim"
+
+eximIQ:
+	.asciz "/var/spool/exim/input"
+
+eximCF:
+	.asciz "-bpc"
+
+datArray:
+	.long eximBin, eximCF, 0
+
+eximCT:
+  .asciz "Messages in Queue:"
+
+newLine:
+	.asciz "\n"
+
+zFlagS:
+	.asciz "Zero flag is set\n"
+
+zFlagNS:
+	.asciz "Zero flag is not set\n"
+
+
+.bss
+	.lcomm strPtr, 4
+	.lcomm strLen, 4
+
+.text
+.globl _start
+
+.type pMsg, @function
+pMsg:
+	pushl %ebp
+	movl %esp, %ebp
+	movl $0x4, %eax
+	movl $0x1, %ebx
+	movl strPtr, %ecx
+	movl strLen, %edx
+	int $0x80
+	movl %ebp, %esp
+	popl %ebp
+	ret
+
+.type eximCount, @function
+eximCount:
+	pushl %ebp
+	movl %esp, %ebp
+  movl $eximCT, strPtr
+  movl $0x13, strLen
+  call pMsg
+
+  movl $eximBin, %ebx
+  movl $datArray, %ecx
+  movl $0x0, %edx
+  movl $0xb, %eax
+  int $0x80
+	movl %ebp, %esp
+	popl %ebp
+	ret
+
+_start:
+	nop
+	movl $motd, strPtr
+  movl $0x41, strLen
+  call pMsg
+
+	call eximCount
+
+	movl $newLine, strPtr
+	movl $0x01, strLen
+	call pMsg
+
+	jmp exit
+
+.type zflagNS, @function
+	zflagNS:
+	pushl %ebp
+	movl %esp, %ebp
+  movl $0x4, %eax
+  movl $0x1, %ebx
+  leal zFlagNS, %ecx
+  movl $0x15, %edx
+	int $0x80
+	movl %ebp, %esp
+	popl %ebp
+
+.type zflagS, @function
+	zflagS:
+	pushl %ebp
+	movl %esp, %ebp
+	movl $0x4, %eax
+	movl $0x1, %ebx
+	leal zFlagS, %ecx
+	movl $0x11, %edx
+	int $0x80
+	movl %ebp, %esp
+	popl %ebp
+	jmp eximCount
+
+exit:
+  movl $0x1,%eax
+  movl $0x0,%ebx
+  int $0x80

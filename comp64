@@ -1,0 +1,17 @@
+#!/bin/bash
+fName=$1
+objfile=$fName.o
+sourcefile=$fName.s
+executable=$fName
+
+if [ -f "./$objfile" ]; then
+echo "Preserving previous compiles"
+mv ./$executable $executable.bak
+as -gstabbs --32 -o $objfile $sourcefile
+ld -melf_i386 -o $executable $objfile
+echo "Compile complete"
+else
+as -gstabbs --32 -o $objfile $sourcefile
+ld -melf_i386 -o $executable $objfile
+echo "Compile Complete"
+fi
